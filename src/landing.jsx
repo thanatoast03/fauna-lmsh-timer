@@ -21,14 +21,14 @@ const Landing = () => {
     }, [seconds])
 
     return (
-        <div className='flex flex-col justify-center h-screen bg-green-300'>
+        <div className='min-h-screen flex flex-col justify-center h-screen w-screen bg-green-300'>
             <div className="flex flex-col justify-evenly items-center text-center flex-grow">
                 <div>
-                    <h1 className='text-4xl'>Let Me Stay Here's Since Epoch</h1>
-                    <h1 className='text-8xl font-bold'>{lmshs}</h1>
+                    <h1 className='sm:text-4xl'>Let Me Stay Here's Since Epoch</h1>
+                    <h1 className='text-6xl sm:text-8xl font-bold'>{lmshs}</h1>
                 </div>
                 <div className='flex flex-col justify-evenly'> 
-                    <iframe width="560" height="315" src="https://www.youtube.com/embed/0RMVJTLZOzQ?si=9EQIUzUCNKubLyTO" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    <iframe className='w-[320px] h-[180px] sm:w-[560px] sm:h-[315px]' src="https://www.youtube.com/embed/0RMVJTLZOzQ?si=9EQIUzUCNKubLyTO" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                     <div className='flex pt-3 justify-center'>
                         <div className='flex flex-row justify-evenly pt-3 w-2/3'>
                             <div className="flex-1 flex-col justify-center text-center">
