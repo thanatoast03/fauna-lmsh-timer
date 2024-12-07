@@ -3,13 +3,13 @@ from flask_socketio import SocketIO, emit
 from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
-CORS(app, origins="http://localhost:1234")
-socketio = SocketIO(app, cors_allowed_origins="http://localhost:1234", transports=["websocket"])
+CORS(app, origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", transports=["websocket"])
 
 counter = 0
 
 @app.route("/increment", methods=["GET"])
-@cross_origin(origins="http://localhost:1234")
+# @cross_origin(origins="http://localhost:1234")
 def addCount():
     global counter 
     counter += 1
