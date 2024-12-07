@@ -4,6 +4,7 @@ import './index.css';  // Import the Tailwind CSS file
 import LMSHTimer from './LMSHTimer.jsx';
 import Navbar from './Navbar.jsx';
 import Landing from './landing.jsx';
+import MILFCount from './MILFcount.jsx';
 
 function App() {
     return(
@@ -13,11 +14,12 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Landing />} />
                     <Route path="/LMSH" element={<LMSHTimer />} />
+                    <Route path="/MILF" element={<MILFCount /> }/>
                 </Routes>
             </BrowserRouter>
             <footer className="flex flex-col text-center p-4 text-sm">
                 <a className='text-green-800' href="https://www.youtube.com/@ceresfauna">Ceres Fauna Ch. hololive-EN</a>
-                <small>Not affiliated with Fauna or hololive</small>
+                <small>Not affiliated with Fauna or Hololive</small>
             </footer>
         </div>
     )

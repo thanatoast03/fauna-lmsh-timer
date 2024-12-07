@@ -21,7 +21,7 @@ const LMSHTimer = () => {
     }, [seconds])
 
     return (
-        <div className='flex flex-col justify-center h-screen bg-green-300'>
+        <div className='flex flex-col justify-center h-screen'>
             <div className="flex flex-col justify-evenly items-center text-center flex-grow">
                 <div>
                     <h1 className='sm:text-4xl'>Let Me Stay Here's Since Epoch</h1>

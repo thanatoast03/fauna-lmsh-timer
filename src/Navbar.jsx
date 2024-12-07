@@ -25,13 +25,13 @@ const Navbar = () => {
                     LMSH Epoch Timer
                 </Link>
                 <Link
-                to="/MILFCount"
+                to="/MILF"
                 className="bg-[#414857] text-[#fdfbc0] px-4 py-2 rounded hover:bg-gray-800 block sm:hidden transform hover:scale-105 hover:shadow-lg"
                 >
                     MILF Count
                 </Link>
                 <Link
-                to="/MILFCount"
+                to="/MILF"
                 className="bg-[#414857] text-[#fdfbc0] px-4 py-2 rounded hover:bg-gray-800 hidden sm:block transform hover:scale-105 hover:shadow-lg"
                 >
                     Man I Love Fauna Counter
