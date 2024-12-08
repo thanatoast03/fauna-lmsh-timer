@@ -9,25 +9,29 @@
         }
       },
       {
-        "src": "package.json",
+        "src": "frontend/package.json",
         "use": "@vercel/static-build",
         "config": {
-            "distDir": "dist"
+          "distDir": "dist"
         }
       }
     ],
     "routes": [
-        {
-            "src": "/api/(.*)",
-            "dest": "backend/api/app.py"
-        },
-        {
-            "src": "/(.*)",
-            "dest": "dist/$1"
-        }
+      {
+        "src": "/socket.io/(.*)",
+        "dest": "backend/api/app.py"
+      },
+      {
+        "src": "/increment",
+        "dest":"backend/api/app.py"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "frontend/dist/$1"
+      }
     ],
     "env": {
-      "WEBSOCKET_URL": "wss://fauna-lmsh-timer.vercel.app",
-      "BACKEND": "https://fauna-lmsh-timer.vercel.app/api"
+      "REACT_APP_WEBSOCKET_URL": "wss://fauna-lmsh-timer.vercel.app",
+      "REACT_APP_BACKEND": "https://fauna-lmsh-timer.vercel.app/api"
     }
   }

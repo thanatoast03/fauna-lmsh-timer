@@ -1,15 +1,19 @@
 from flask import Flask, jsonify
 from flask_socketio import SocketIO, emit
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app, origins="*")
-socketio = SocketIO(app, cors_allowed_origins="*", transports=["websocket"])
+socketio = SocketIO(app, 
+            cors_allowed_origins="*", 
+            async_mode='threading',
+            ping_timeout=5,
+            ping_interval=5,
+            transports=["websocket"])
 
 counter = 0
 
 @app.route("/increment", methods=["GET"])
-# @cross_origin(origins="http://localhost:1234")
 def addCount():
     global counter 
     counter += 1
@@ -28,5 +32,10 @@ def handle_connect():
 def handle_disconnect():
     print("client disconnected")
 
-if __name__ == '__main__':
-    socketio.run(app, host="0.0.0.0", port=8080)
+# This is crucial for Vercel
+def create_app():
+    return app
+
+# TODO: comment this out on Vercel deployment
+# if __name__ == '__main__':
+#     socketio.run(app, host="0.0.0.0", port=8080)

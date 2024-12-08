@@ -18,8 +18,11 @@ function App() {
                 </Routes>
             </BrowserRouter>
             <footer className="flex flex-col text-center p-4 text-sm">
-                <a className='text-green-800' href="https://www.youtube.com/@ceresfauna">Ceres Fauna Ch. hololive-EN</a>
+                <a className='text-green-800 hover:underline' href="https://www.youtube.com/@ceresfauna">Ceres Fauna Ch. hololive-EN</a>
                 <small>Not affiliated with Fauna or Hololive</small>
+                <a className='hover:underline' href="https://x.com/braindoko">
+                    <small>Created by @braindoko</small>
+                </a>
             </footer>
         </div>
     )
