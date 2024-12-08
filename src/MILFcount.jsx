@@ -6,7 +6,7 @@ const MILFCount = () => {
     const [connected, setConnected] = useState(false);
 
     useEffect(() => {
-        const socket = io('ws://localhost:8080', {
+        const socket = io(process.env.WEBSOCKET_URL, { //* CHANGE ON PROD TO WSS AND VERCEL_URL/api/socket.io
             transports: ["websocket"]
         });  // Flask-SocketIO server
 
@@ -34,7 +34,7 @@ const MILFCount = () => {
 
     const incrementCounter = async () => {
         try {
-          const response = await fetch('http://localhost:8080/increment', {
+          const response = await fetch(process.env.BACKEND + '/increment', { //* CHANGE TO PROD_BACKEND ON PROD
             method: "GET"
           });
           const data = await response.json();
