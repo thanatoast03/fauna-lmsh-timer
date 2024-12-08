@@ -5,7 +5,10 @@
   "source": "src/index.html",
   "scripts": {
     "start": "rm -rf .parcel-cache && parcel",
-    "build": "rm -rf .parcel-cache && parcel build"
+    "build": "parcel build src/index.html --dist-dir dist --public-url ./",
+    "clean": "rm -rf node_modules && rm -rf dist && npm cache clean --force",
+    "reinstall": "npm run clean && npm install --no-fund --no-audit",
+    "prune": "npm prune"
   },
   "keywords": [],
   "author": "",
