@@ -27,7 +27,7 @@
         }
     ],
     "env": {
-      "WEBSOCKET_URL": "wss://fauna-lmsh-timer.vercel.app/api/socket.io",
+      "WEBSOCKET_URL": "wss://fauna-lmsh-timer.vercel.app",
       "BACKEND": "https://fauna-lmsh-timer.vercel.app/api"
     }
   }
