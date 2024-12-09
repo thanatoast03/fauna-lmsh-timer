@@ -2,37 +2,28 @@
     "version": 2,
     "builds": [
       {
-        "src": "backend/api/app.py",
-        "use": "@vercel/python",
-        "config": {
-          "runtime": "python3.9"
-        }
-      },
-      {
         "src": "frontend/package.json",
         "use": "@vercel/static-build",
         "config": {
-          "distDir": "dist",
-          "maxLambdaSize": "500mb"
+          "distDir": "frontend/dist"
         }
+      },
+      {
+        "src": "backend/api/**/*.py",
+        "use": "@vercel/python"
       }
     ],
     "routes": [
       {
-        "src": "/socket.io/(.*)",
-        "dest": "backend/api/app.py"
-      },
-      {
-        "src": "/increment",
-        "dest":"backend/api/app.py"
+        "src": "/api/(.*)",
+        "dest": "/backend/api/$1"
       },
       {
         "src": "/(.*)",
-        "dest": "frontend/dist/$1"
+        "dest": "/frontend/$1"
       }
     ],
     "env": {
-      "REACT_APP_WEBSOCKET_URL": "wss://fauna-lmsh-timer.vercel.app",
       "REACT_APP_BACKEND": "https://fauna-lmsh-timer.vercel.app/api"
     }
   }

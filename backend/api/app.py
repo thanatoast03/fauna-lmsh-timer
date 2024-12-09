@@ -1,15 +1,8 @@
 from flask import Flask, jsonify
-from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app, origins="*")
-socketio = SocketIO(app, 
-            cors_allowed_origins="*", 
-            async_mode='threading',
-            ping_timeout=5,
-            ping_interval=5,
-            transports=["websocket"])
 
 counter = 0
 
@@ -17,25 +10,21 @@ counter = 0
 def addCount():
     global counter 
     counter += 1
-    print(counter)
 
-    socketio.emit('update_counter', {'counter':counter})
+    return get_counter()
 
-    return jsonify({'message': 'Counter incremented', 'counter': counter})
-
-@socketio.on('connect')
-def handle_connect():
-    print("client connected")
-    emit('update_counter', {'counter':counter})
-
-@socketio.on('disconnect')
-def handle_disconnect():
-    print("client disconnected")
+@app.route('/getCounter', methods=['GET'])
+def get_counter():
+    """
+    Endpoint for long polling to get the current counter value.
+    Simulate a delay to mimic long polling behavior if necessary.
+    """
+    return jsonify({"counter":counter})
 
 # This is crucial for Vercel
 def create_app():
     return app
 
 # TODO: comment this out on Vercel deployment
-# if __name__ == '__main__':
-#     socketio.run(app, host="0.0.0.0", port=8080)
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=8080, debug=True)
