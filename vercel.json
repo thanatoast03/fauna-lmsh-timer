@@ -9,8 +9,11 @@
         }
       },
       {
-        "src": "backend/api/**/*.py",
-        "use": "@vercel/python"
+        "src": "backend/api/app.py",
+        "use": "@vercel/python",
+        "config": {
+          "runtime": "python3.9"
+        }
       }
     ],
     "routes": [
