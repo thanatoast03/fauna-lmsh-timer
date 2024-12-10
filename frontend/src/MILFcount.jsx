@@ -20,7 +20,7 @@ const MILFCount = () => {
             setConnected(false); // Assume disconnection on error
         } finally {
             // Call fetchCounter again after a delay (long-polling)
-            setTimeout(fetchCounter, 5000); // Adjust interval as needed
+            setTimeout(fetchCounter, 10000); // Adjust interval as needed
         }
     };
 
