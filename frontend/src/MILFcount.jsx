@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 const MILFCount = () => {
     const [counter, setCounter] = useState(0);
     const [connected, setConnected] = useState(true);
+    const [hash, setHash] = useState(window.location.hash);
 
     // Function to fetch the counter value
     const fetchCounter = async () => {
@@ -18,16 +19,26 @@ const MILFCount = () => {
         } catch (error) {
             console.error('Error fetching counter:', error);
             setConnected(false); // Assume disconnection on error
-        } finally {
-            // Call fetchCounter again after a delay (long-polling)
-            setTimeout(fetchCounter, 10000); // Adjust interval as needed
-        }
+        } 
     };
 
     // Start long polling when the component mounts
     useEffect(() => {
-        fetchCounter();
-    }, []);
+        const onHashChange = () => {
+            setHash(window.location.hash);  // Update hash state
+        };
+        window.addEventListener('hashchange', onHashChange);
+
+        const interval = setInterval(() => {
+            fetchCounter();
+        }, 5000);
+        
+        return () => {
+            console.log('Cleaning up polling');
+            clearInterval(interval);
+            window.removeEventListener('hashchange', onHashChange);  // Remove event listener
+        }
+    }, [hash]);
 
     // Function to increment the counter
     const incrementCounter = async () => {
@@ -45,12 +56,12 @@ const MILFCount = () => {
     return (
         <div className='flex flex-col justify-center items-center text-center h-screen'>
             <p>Counter: {counter}</p>
-            {connected ? (
+            {/* {connected ? (
                 <p>Connected to server</p>
             ) : (
                 <p className="text-red-500">Disconnected from server</p>
-            )}
-            <button onClick={incrementCounter}>Increment Counter</button>
+            )} */}
+            <button className="border" onClick={incrementCounter}>MAN I LOVE FAUNA</button>
         </div>
     );
 };
