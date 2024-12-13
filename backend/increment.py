@@ -1,10 +1,7 @@
-# /api/increment.py
 from flask import Flask, jsonify
-# from flask_cors import CORS
-from .counter import get_counter_value, update_counter_value
+from .counter import update_counter_value
 
 app = Flask(__name__)
-# CORS(app, origins="*")
 
 @app.route('/api/increment', methods=['GET'])
 def increment():

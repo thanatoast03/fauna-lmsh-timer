@@ -1,15 +1,20 @@
-FROM python:3.12.8 AS builder
+# syntax = docker/dockerfile:1
 
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1
-WORKDIR /app
+FROM python:3.12.8-slim AS final
 
+# Create virtual environment in the correct location
+RUN python -m venv /opt/venv
 
-RUN python -m venv .venv
-COPY requirements.txt ./
-RUN .venv/bin/pip install -r requirements.txt
-FROM python:3.12.8-slim
-WORKDIR /app
-COPY --from=builder /app/.venv .venv/
-COPY . .
-CMD ["/app/.venv/bin/flask", "run", "--host=0.0.0.0", "--port=8080"]
+# Install Python dependencies
+COPY backend/requirements.txt .
+RUN /opt/venv/bin/pip install -r requirements.txt
+
+# Copy backend application code
+COPY backend/ /app/backend
+
+# Copy .env file
+COPY .env .
+
+WORKDIR /app/backend
+EXPOSE 8080
+CMD ["/opt/venv/bin/flask", "run", "--host=0.0.0.0", "--port=8080"]

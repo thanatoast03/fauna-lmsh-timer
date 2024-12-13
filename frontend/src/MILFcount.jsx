@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 const MILFCount = () => {
     const [counter, setCounter] = useState(0);
     const [connected, setConnected] = useState(true);
-    const [hash, setHash] = useState(window.location.hash);
+    const [loading, setLoading] = useState(true);
+    // const [hash, setHash] = useState(window.location.hash);
 
     // Function to fetch the counter value
     const fetchCounter = async () => {
@@ -22,23 +23,44 @@ const MILFCount = () => {
         } 
     };
 
-    // Start long polling when the component mounts
     useEffect(() => {
-        const onHashChange = () => {
-            setHash(window.location.hash);  // Update hash state
-        };
-        window.addEventListener('hashchange', onHashChange);
-
-        const interval = setInterval(() => {
-            fetchCounter();
-        }, 5000);
+        fetchCounter()
+        .finally(() => {
+            setLoading(false);
+        }) // fetch ONCE to get counter
+    
+        // Open event source for streaming
+        const eventSource = new EventSource(`${process.env.REACT_APP_BACKEND}/api/stream`);
         
+        eventSource.onopen = () => {
+            console.log('Connection established');
+        };
+
+        // only expected change to database is update
+        eventSource.onmessage = (event) => { 
+            try {
+                console.log(event);
+                const data = JSON.parse(event.data);
+                setCounter(data.counter);
+            } catch (error){
+                const data = JSON.parse(event.data);
+                console.log('error: ', data.error);
+            }
+        };
+
+        eventSource.onerror = (error) => {
+            console.error('EventSource failed:', error);
+            eventSource.close();
+        };
+
+        // TODO: set interval to check if event source broken
+    
+        // Cleanup
         return () => {
-            console.log('Cleaning up polling');
-            clearInterval(interval);
-            window.removeEventListener('hashchange', onHashChange);  // Remove event listener
-        }
-    }, [hash]);
+            console.log("DB stream closed");
+            eventSource.close();
+        };  
+    }, []);
 
     // Function to increment the counter
     const incrementCounter = async () => {
@@ -46,12 +68,20 @@ const MILFCount = () => {
             const response = await fetch(`${process.env.REACT_APP_BACKEND}/increment`, { //* CHANGE TO PROD_BACKEND ON PROD
                 method: 'GET',
             });
-            const data = await response.json();
-            setCounter(data.counter);
+            // const data = await response.json();
+            // setCounter(data.counter);
         } catch (err) {
             console.error('Error incrementing counter:', err);
         }
     };
+
+    if (loading) {
+        return (
+            <div className='flex flex-col justify-center items-center text-center h-screen'>
+                <div>Loading...</div>
+            </div>
+        )
+    }
 
     return (
         <div className='flex flex-col justify-center items-center text-center h-screen'>

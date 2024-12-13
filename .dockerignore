@@ -3,3 +3,8 @@ fly.toml
 __pycache__/
 .envrc
 .venv/
+.dockerignore
+Dockerfile
+/frontend
+vercel.json
+.vercelignore

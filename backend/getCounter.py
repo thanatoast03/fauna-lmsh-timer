@@ -1,9 +1,5 @@
-# /api/getCounter.py
 from flask import Flask, jsonify
 from .counter import get_counter_value
-import os
-
-print(os.listdir('/var/task/api'))
 
 app = Flask(__name__)
 
