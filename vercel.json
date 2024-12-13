@@ -1,4 +1,7 @@
 {
+    "scripts": {
+        "build": "parcel build src/index.html --dist-dir dist --public-url /"
+    },
     "rewrites": [
       {
         "source": "/api/:path*", 
