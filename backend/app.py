@@ -4,6 +4,7 @@ from fauna.encoding import QuerySuccess
 from fauna.errors import FaunaException
 from dotenv import load_dotenv
 from flask import Flask, jsonify, Response
+from flask_cors import CORS
 import os, sys, json, time
 
 load_dotenv()
@@ -12,6 +13,7 @@ secret = os.getenv('FAUNADB_SECRET_KEY')
 counter_id = os.getenv("COUNTER_ID")
 
 app = Flask(__name__)
+CORS(app, resources={r"/api/*": {"origins": ["https://fauna-lmsh-timer.vercel.app"]}})
 
 client = Client(secret=secret)
 

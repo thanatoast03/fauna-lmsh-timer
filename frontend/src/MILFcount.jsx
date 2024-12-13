@@ -30,7 +30,7 @@ const MILFCount = () => {
         }) // fetch ONCE to get counter
     
         // Open event source for streaming
-        const eventSource = new EventSource(`${process.env.REACT_APP_BACKEND}/api/stream`);
+        const eventSource = new EventSource(`${process.env.REACT_APP_BACKEND}/stream`);
         
         eventSource.onopen = () => {
             console.log('Connection established');
