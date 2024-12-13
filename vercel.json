@@ -1,7 +1,12 @@
 {
-    "scripts": {
-        "build": "parcel build src/index.html --dist-dir dist --public-url /"
-    },
+    "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/node",
+      "config": {
+        "distDir": "frontend/dist"
+      }
+    }],
     "rewrites": [
       {
         "source": "/api/:path*", 
