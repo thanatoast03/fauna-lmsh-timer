@@ -1,7 +1,4 @@
-# fly.toml app configuration file generated for fauna-lmsh-timer on 2024-12-12T04:30:17Z
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
+# Updated fly.toml for WebSocket support
 
 app = "fauna-lmsh-timer"
 primary_region = "yyz"
@@ -11,38 +8,46 @@ primary_region = "yyz"
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = 'stop'
+  auto_stop_machines = true
   auto_start_machines = true
   min_machines_running = 0
   processes = ['app']
 
+[http_service.health_checks]
+  type = "http"
+  path = "/"  # or a specific health check endpoint if you have one
+  grace_period = "30s"  # give more time to start up
+  interval = "15s"
+  timeout = "10s"
+  restart_limit = 3  # allow more restart attempts
+
+# Explicitly configure WebSocket support
 [[services]]
-  http_checks = []
+  # http_checks = []
   internal_port = 8080
-  processes = ["app"]
+  # processes = ["app"]
   protocol = "tcp"
-  script_checks = []
-  [services.concurrency]
-    hard_limit = 25
-    soft_limit = 20
-    type = "connections"
+  
+  # WebSocket-specific configuration
+  [services.websockets]
+    enabled = true
 
   [[services.ports]]
-    force_https = true
     handlers = ["http"]
     port = 80
+    force_https = true
 
   [[services.ports]]
     handlers = ["tls", "http"]
     port = 443
 
-  [[services.tcp_checks]]
-    grace_period = "1s"
-    interval = "15s"
-    restart_limit = 0
-    timeout = "2s"
+  # [[services.tcp_checks]]
+  #   grace_period = "10s"
+  #   interval = "15s"
+  #   restart_limit = 0
+  #   timeout = "10s"
 
 [[vm]]
-  memory = "256mb"
+  memory = "512mb"  # Increased for WebSocket support
   cpu_kind = "shared"
   cpus = 1

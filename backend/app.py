@@ -3,9 +3,11 @@ from fauna.client import Client
 from fauna.encoding import QuerySuccess
 from fauna.errors import FaunaException
 from dotenv import load_dotenv
-from flask import Flask, jsonify, Response
+from flask import Flask, jsonify
 from flask_cors import CORS
-import os, sys, json, time
+from flask_socketio import SocketIO, emit
+from threading import Thread
+import os, sys, json
 
 load_dotenv()
 
@@ -14,6 +16,7 @@ counter_id = os.getenv("COUNTER_ID")
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": ["https://fauna-lmsh-timer.vercel.app"]}})
+socketio = SocketIO(app, path='/api/ws', cors_allowed_origins="https://fauna-lmsh-timer.vercel.app")
 
 client = Client(secret=secret)
 
@@ -51,7 +54,8 @@ def stream_counter():
                     if event.get('type') == 'update':
                         document: Document = event['data']
                         counter_value = document.get('counter', 0)
-                        yield f"data: {json.dumps({'counter': counter_value})}\n\n" # TODO: FOR SOME REASON THIS SHIT NEVER SENDS
+                        # yield f"data: {json.dumps({'counter': counter_value})}\n\n" 
+                        emit('counter_update', {'value':counter_value}, broadcast=True) # send to all websockets
                         print(f"New counter value: {counter_value}", file=sys.stderr)
             
             except Exception as inner_e:
@@ -73,29 +77,34 @@ def stream_counter():
 
 #* ROUTES
 
-@app.route('/api/getCounter', methods=['GET'])
-def get_counter():
+@socketio.on('connect')
+def socket_connect():
+    print("client connected")
     counter = get_counter_value()
-    return jsonify({"counter":counter}), 200
+    emit('counter_update', {'value': counter})
 
-@app.route('/api/increment', methods=['GET'])
-def increment():
-    new_counter = update_counter_value()
-    return jsonify({"counter":new_counter}), 200
+@socketio.on('increment')
+def socket_increment():
+    new_counter = update_counter_value() # will broadcast new value to all in websocket
+    emit('counter_update', {'value': new_counter})
+    print(new_counter)
 
-@app.route('/api/stream')
-def stream():
-    print("Attempting SSE connection", file=sys.stdout)
+@socketio.on('disconnect')
+def socket_disconnect():
+    print("client disconnected")
 
-    # Set headers for Server-Sent Events (SSE)
-    headers = {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-open'
-    }
-    
-    # Return a generator that can be streamed
-    return Response(stream_counter(), mimetype='text/event-stream', headers=headers)
+@socketio.on_error()
+def error_handler(e):
+    print(f"SocketIO Error: {e}")
+    emit('error', {'message': str(e)})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # app.run(debug=True)
+    socketio.run(app, host="0.0.0.0", port=8080)
+    # socketio.run(app)
+
+    # stream_thread = Thread(target=stream_counter) # make a counter faunadb stream running on its own thread
+    # stream_thread.daemon = True
+    # stream_thread.start()
+
+    

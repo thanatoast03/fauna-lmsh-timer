@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import io from 'socket.io-client';
 
 const MILFCount = () => {
     const [counter, setCounter] = useState(0);
     const [connected, setConnected] = useState(true);
     const [loading, setLoading] = useState(true);
+    const [socket, setSocket] = useState(null);
     // const [hash, setHash] = useState(window.location.hash);
 
     // Function to fetch the counter value
@@ -25,52 +27,75 @@ const MILFCount = () => {
 
     useEffect(() => {
         // testing commit for vercel
-        fetchCounter()
-        .finally(() => {
-            setLoading(false);
-        }) // fetch ONCE to get counter
-    
-        // Open event source for streaming
-        const eventSource = new EventSource(`${process.env.REACT_APP_BACKEND}/stream`);
+        const newSocket = io(`${process.env.REACT_APP_SOCKET}`, {
+            path: "/api/ws",
+            transports: ['websocket'],  // Force WebSocket
+        });
+
+        setSocket(newSocket);
         
-        eventSource.onopen = () => {
-            console.log('Connection established');
-        };
-
-        // only expected change to database is update
-        eventSource.onmessage = (event) => { 
-            try {
-                console.log(event);
-                const data = JSON.parse(event.data);
-                setCounter(data.counter);
-            } catch (error){
-                const data = JSON.parse(event.data);
-                console.log('error: ', data.error);
-            }
-        };
-
-        eventSource.onerror = (error) => {
-            console.error('EventSource failed:', error);
-            eventSource.close();
-        };
-
-        // TODO: set interval to check if event source broken
+        newSocket.on('connect', () => {
+            console.log('Socket connected');
+            setLoading(false);
+        });
     
-        // Cleanup
-        return () => {
-            console.log("DB stream closed");
-            eventSource.close();
-        };  
+        newSocket.on('counter_update', (data) => {
+            setCounter(data.value);
+        });
+
+        newSocket.on('error', (data) => {
+            console.log(data.message);
+        })
+    
+        return () => newSocket.disconnect();
+
+        // fetchCounter()
+        // .finally(() => {
+        //     setLoading(false);
+        // }) // fetch ONCE to get counter
+    
+        // // Open event source for streaming
+        // const eventSource = new EventSource(`${process.env.REACT_APP_BACKEND}/stream`);
+        
+        // eventSource.onopen = () => {
+        //     console.log('Connection established');
+        // };
+
+        // // only expected change to database is update
+        // eventSource.onmessage = (event) => { 
+        //     try {
+        //         console.log(event);
+        //         const data = JSON.parse(event.data);
+        //         setCounter(data.counter);
+        //     } catch (error){
+        //         const data = JSON.parse(event.data);
+        //         console.log('error: ', data.error);
+        //     }
+        // };
+
+        // eventSource.onerror = (error) => {
+        //     console.error('EventSource failed:', error);
+        //     eventSource.close();
+        // };
+
+        // // TODO: set interval to check if event source broken
+    
+        // // Cleanup
+        // return () => {
+        //     console.log("DB stream closed");
+        //     eventSource.close();
+        // };  
     }, []);
 
     // Function to increment the counter
     const incrementCounter = async () => {
         try {
-            const response = await fetch(`${process.env.REACT_APP_BACKEND}/increment`, { //* CHANGE TO PROD_BACKEND ON PROD
-                method: 'GET',
-            });
+            // const response = await fetch(`${process.env.REACT_APP_BACKEND}/increment`, { //* CHANGE TO PROD_BACKEND ON PROD
+            //     method: 'GET',
+            // });
             // const data = await response.json();
             // setCounter(data.counter);
+            socket.emit('increment');
         } catch (err) {
             console.error('Error incrementing counter:', err);
         }
