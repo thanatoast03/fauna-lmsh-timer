@@ -86,7 +86,7 @@ def socket_connect():
 @socketio.on('increment')
 def socket_increment():
     new_counter = update_counter_value() # will broadcast new value to all in websocket
-    emit('counter_update', {'value': new_counter})
+    emit('counter_update', {'value': new_counter}, broadcast=True)
     print(new_counter)
 
 @socketio.on('disconnect')
