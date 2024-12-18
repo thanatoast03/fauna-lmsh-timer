@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
-import grayscale from "../public/images/uuu.jpg";
-import animated from "../public/images/animated_uuu.gif";
+import grayscale from "../public/images/uuu.webp";
+import animated from "../public/images/animated_uuu.webp";
 
 const MILFCount = () => {
     const [counter, setCounter] = useState(0);
@@ -17,7 +17,7 @@ const MILFCount = () => {
             path: "/api/ws",
             transports: ['websocket'],  // Force WebSocket
         });
-        setLoading(false); // TODO: ERASE THIS ON PROD
+        process.env.REACT_APP_PROD === "false" ? setLoading(false) : setLoading(loading); 
         setSocket(newSocket);
         
         newSocket.on('connect', () => {
@@ -55,7 +55,7 @@ const MILFCount = () => {
     }
 
     return (
-        <div className='flex flex-col h-screen'>
+        <div className='flex flex-col h-full'>
             <div className='flex flex-col justify-center items-center flex-grow'>
                 <h1 className='text-4xl sm:text-6xl font-bold'>{counter}</h1>
                 <h1 className='text-2xl sm:text-4xl pb-10'>Man I Love Fauna Counter</h1>

@@ -14,8 +14,8 @@ secret = os.getenv('FAUNADB_SECRET_KEY')
 counter_id = os.getenv("COUNTER_ID")
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": ["https://fauna-lmsh-timer.vercel.app"]}})
-socketio = SocketIO(app, path='/api/ws', cors_allowed_origins="https://fauna-lmsh-timer.vercel.app")
+CORS(app, resources={r"/api/*": {"origins": ["https://fauna-fun-sites.vercel.app"]}})
+socketio = SocketIO(app, path='/api/ws', cors_allowed_origins="https://fauna-fun-sites.vercel.app")
 
 client = Client(secret=secret)
 

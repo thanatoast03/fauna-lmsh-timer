@@ -8,7 +8,7 @@ const Landing = () => {
     const navMILF = () => { navigate('/MILF'); }
 
     return (
-        <div className='flex flex-col justify-center text-center items-center h-screen'>
+        <div className='flex flex-col justify-center text-center items-center h-full'>
             <h1 className='max-w-sm sm:text-2xl sm:max-w-max font-bold'>Hello! This is a site dedicated to random projects for Ceres Fauna!</h1>
             <div className='flex flex-row justify-evenly text-center items-stretch h-1/5 w-3/4 border-2 border-[#557891] mt-8 rounded-md md:w-1/2'>
                 <button className='flex justify-center items-center flex-grow max-w-sm rounded-md m-4 p-4 hidden lg:block transform hover:scale-105 hover:shadow-lg hover:bg-[#5f7b8d] bg-[#80b5a5]' onClick={navLMSH}>
