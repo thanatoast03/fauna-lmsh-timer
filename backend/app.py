@@ -1,13 +1,12 @@
-from fauna import fql, Document
+from fauna import fql
 from fauna.client import Client
 from fauna.encoding import QuerySuccess
 from fauna.errors import FaunaException
 from dotenv import load_dotenv
-from flask import Flask, jsonify
+from flask import Flask
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
-from threading import Thread
-import os, sys, json
+import os, sys
 
 load_dotenv()
 
@@ -39,42 +38,6 @@ def update_counter_value():
     except FaunaException as e:
         print("Exception occurred: " + e, file=sys.stderr)
 
-def stream_counter():
-    try:
-        # Initialize the stream query
-        stream_query = client.stream(fql(f"Set.single(counter.byId({counter_id})!).eventsOn(.counter)"))
-        print("Stream initialized successfully", file=sys.stderr)
-        
-        while True:
-            try:
-                # Get the next event from the stream, or None if no event is available
-                event = next(stream_query, None)
-                
-                if event:
-                    if event.get('type') == 'update':
-                        document: Document = event['data']
-                        counter_value = document.get('counter', 0)
-                        # yield f"data: {json.dumps({'counter': counter_value})}\n\n" 
-                        emit('counter_update', {'value':counter_value}, broadcast=True) # send to all websockets
-                        print(f"New counter value: {counter_value}", file=sys.stderr)
-            
-            except Exception as inner_e:
-                # Log and handle any exceptions during the event streaming
-                print(f"Error during stream processing: {str(inner_e)}", file=sys.stderr)
-                yield f"data: {json.dumps({"error": f"Error {str(inner_e)}\n\n"})}"
-                break  # Optionally, break the loop on failure to process event
-            
-    except FaunaException as e:
-        print(f"FaunaDB Exception: {str(e)}", file=sys.stderr)
-        yield f"data: {json.dumps({"error": f"Error {str(e)}\n\n"})}"
-    except Exception as e:
-        # Catch any unexpected exceptions that occur outside the streaming logic
-        print(f"Unexpected error: {str(e)}", file=sys.stderr)
-        yield f"data: {json.dumps({"error": f"Error {str(e)}\n\n"})}"
-    
-    # If you end up here, it means the loop was broken unexpectedly.
-    print("Exiting stream_counter unexpectedly", file=sys.stderr)
-
 #* ROUTES
 
 @socketio.on('connect')
@@ -101,10 +64,5 @@ def error_handler(e):
 if __name__ == "__main__":
     # app.run(debug=True)
     socketio.run(app, host="0.0.0.0", port=8080)
-    # socketio.run(app)
-
-    # stream_thread = Thread(target=stream_counter) # make a counter faunadb stream running on its own thread
-    # stream_thread.daemon = True
-    # stream_thread.start()
 
     

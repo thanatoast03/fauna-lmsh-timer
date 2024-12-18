@@ -37,7 +37,7 @@ const LMSHTimer = () => {
                                     href="https://open.spotify.com/track/3z6Mq8NBLhmct2obP1lU4h?autoplay=true"
                                 >
                                     <div className="flex justify-center items-center">
-                                        <img src={spotify} className="w-10 h-10" />
+                                        <img src={spotify} alt='spotify icon' className="w-10 h-10" />
                                     </div>
                                     <p className="text-xs pt-2">Spotify</p>
                                 </a>
@@ -49,7 +49,7 @@ const LMSHTimer = () => {
                                     href="https://music.youtube.com/watch?v=mJSFX_Sbmlk"
                                 >
                                     <div className="flex justify-center items-center">
-                                        <img src={youtube_music} className="w-10 h-10" />
+                                        <img src={youtube_music} alt='youtube icon' className="w-10 h-10" />
                                     </div>
                                     <p className="text-xs pt-2">Youtube Music</p>
                                 </a>
@@ -61,7 +61,7 @@ const LMSHTimer = () => {
                                     href="https://music.apple.com/us/album/let-me-stay-here-single/1624026668"
                                 >
                                     <div className="flex justify-center items-center">
-                                        <img src={apple_music} className="w-10 h-10" />
+                                        <img src={apple_music} alt='apple music icon' className="w-10 h-10" />
                                     </div>
                                     <p className="text-xs pt-2">Apple Music</p>
                                 </a>
