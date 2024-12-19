@@ -3,3 +3,4 @@ Dockerfile
 fly.toml
 vercel.json
 .dockerignore
+credentials.json

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
-import grayscale from "../public/images/uuu.webp";
-import animated from "../public/images/animated_uuu.webp";
+import grayscale from "../../public/images/uuu.webp";
+import animated from "../../public/images/animated_uuu.webp";
 
 const MILFCount = () => {
     const [counter, setCounter] = useState(0);
@@ -9,10 +9,8 @@ const MILFCount = () => {
     const [imageSrc, setImageSrc] = useState(grayscale);
     const [loading, setLoading] = useState(true);
     const [socket, setSocket] = useState(null);
-    // const [hash, setHash] = useState(window.location.hash);
 
     useEffect(() => {
-        // testing commit for vercel
         const newSocket = io(`${process.env.REACT_APP_SOCKET}`, {
             path: "/api/ws",
             transports: ['websocket'],  // Force WebSocket
@@ -20,33 +18,33 @@ const MILFCount = () => {
         process.env.REACT_APP_PROD === "false" ? setLoading(false) : setLoading(loading); 
         setSocket(newSocket);
         
-        newSocket.on('connect', () => {
+        newSocket.on('connect', () => { // websocket initialized
             console.log('Socket connected');
             setLoading(false);
         });
     
-        newSocket.on('counter_update', (data) => {
+        newSocket.on('counter_update', (data) => { // counter updated between clients
             setCounter(data.value);
         });
 
-        newSocket.on('error', (data) => {
+        newSocket.on('error', (data) => { // error occurred
             console.log(data.message);
         })
     
-        return () => newSocket.disconnect();
+        return () => newSocket.disconnect(); // disconnect on page switch
     }, []);
 
     // Function to increment the counter
     const incrementCounter = async () => {
         try {
-            setLocalCounter(localCounter + 1);
-            socket.emit('increment');
+            setLocalCounter(localCounter + 1); // locally increment how many clicks
+            socket.emit('increment'); // update all clients
         } catch (err) {
             console.error('Error incrementing counter:', err);
         }
     };
 
-    if (loading) {
+    if (loading) { // display when loading
         return (
             <div className='flex flex-col justify-center items-center text-center h-screen'>
                 <div>Loading...</div>

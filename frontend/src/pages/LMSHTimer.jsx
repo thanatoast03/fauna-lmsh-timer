@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getUnixTime } from "date-fns";
-import spotify from '../public/images/Spotify_Primary_Logo_RGB_Green.png';
-import youtube_music from '../public/images/music_icon_1024px.png';
-import apple_music from '../public/images/apple_music_logo.png';
+import spotify from '../../public/images/Spotify_Primary_Logo_RGB_Green.png';
+import youtube_music from '../../public/images/music_icon_1024px.png';
+import apple_music from '../../public/images/apple_music_logo.png';
 
 const LMSHTimer = () => {
     const [seconds, setSeconds] = useState(getUnixTime(new Date()));
