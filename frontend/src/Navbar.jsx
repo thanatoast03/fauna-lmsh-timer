@@ -1,10 +1,28 @@
 import { Link } from 'react-router-dom';
-import { React, useState } from 'react';
+import { React, useState, useRef, useEffect } from 'react';
 import './index.css';
-import hamburger_menu from '../public/images/hamburger-menu-icon.webp';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef(null);
+    const buttonRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (isOpen && 
+                dropdownRef.current && 
+                !dropdownRef.current.contains(event.target) &&
+                !buttonRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isOpen]);
+
     const handleClick = () => {
         setIsOpen(!isOpen);
     };
@@ -55,36 +73,55 @@ const Navbar = () => {
                     </Link>
                 </div>
 
-                {/* Hamburger Icon */}
-                <img
-                    src={hamburger_menu}
-                    className="w-[24px] h-[24px] block sm:hidden cursor-pointer"
+                {/* Hamburger Button */}
+                <button
+                    ref={buttonRef}
+                    className="block sm:hidden w-6 h-6 cursor-pointer relative"
                     onClick={handleClick}
-                    alt="menu"
-                />
+                    aria-label="Toggle menu"
+                >
+                    <span 
+                        className={`block absolute h-0.5 w-6 bg-[#fdfbc0] transform transition duration-300 ease-in-out ${
+                            isOpen ? 'rotate-45 translate-y-1.5' : '-translate-y-2'
+                        }`}
+                    />
+                    <span 
+                        className={`block absolute h-0.5 w-6 bg-[#fdfbc0] transform transition duration-300 ease-in-out ${
+                            isOpen ? 'opacity-0' : 'opacity-100'
+                        }`}
+                    />
+                    <span 
+                        className={`block absolute h-0.5 w-6 bg-[#fdfbc0] transform transition duration-300 ease-in-out ${
+                            isOpen ? '-rotate-45 -translate-y-1.5' : 'translate-y-2'
+                        }`}
+                    />
+                </button>
             </nav>
 
             {/* Dropdown Menu */}
             {isOpen && (
-                <div className="absolute right-0 top-full bg-white text-black w-[200px] shadow-lg rounded-lg sm:hidden">
+                <div 
+                    ref={dropdownRef}
+                    className="absolute right-0 top-full bg-white text-black w-[200px] shadow-lg rounded-lg sm:hidden"
+                >
                     <Link
                         to="/submissions"
                         className="block px-4 py-2 hover:bg-gray-200"
-                        onClick={() => {setIsOpen(!isOpen)}}
+                        onClick={() => {setIsOpen(false)}}
                     >
                         Faunart
                     </Link>
                     <Link
                         to="/LMSH"
                         className="block px-4 py-2 hover:bg-gray-200"
-                        onClick={() => {setIsOpen(!isOpen)}}
+                        onClick={() => {setIsOpen(false)}}
                     >
                         LMSH Epoch Timer
                     </Link>
                     <Link
                         to="/MILF"
                         className="block px-4 py-2 hover:bg-gray-200 rounded-b-lg"
-                        onClick={() => {setIsOpen(!isOpen)}}
+                        onClick={() => {setIsOpen(false)}}
                     >
                         Man I Love Fauna Counter
                     </Link>

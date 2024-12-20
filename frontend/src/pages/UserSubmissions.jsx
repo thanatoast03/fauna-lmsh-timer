@@ -1,95 +1,48 @@
 import { React, useState } from 'react';
-import testImage from '../../public/images/konfauna.png';
-import send from '../../public/images/send.webp';
-import UserSubmissionModule from './UserSubmissionModule';
+import ogImage from '../../public/images/konfauna.png';
+import UserSubmissionImage from './modules/UserSubmissionImage';
+import UserSubmissionModal from './modules/UserSubmissionModal';
 
 const UserSubmissions = () => {
     const acceptedImages = [
         {
-            "creator": "Sappy",
+            "creator": "Summer Floofy",
             "submitter": "braindoko",
-            "creatorLink": "https://x.com/Sappysque",
+            "creatorLink": "https://x.com/SummerFloofball",
             "submitterLink": "https://x.com/braindoko",
-            "image_path": testImage
+            "image_path": ogImage
         }, 
     ];
 
+    // holds state so not deleted when user exits modal
     const [username, setUsername] = useState('');
     const [submitterLink, setSubmitterLink] = useState('');
     const [imageLink, setImageLink] = useState('');
-    const [status, setStatus] = useState('');
-
-    const handleSend = async () => {
-        try {
-            const response = fetch(`${process.env.REACT_APP_PROD}/user_submission`, {
-                method: "POST",
-                headers: {
-                    'Content-Type':'application/json'
-                },
-                body: JSON.stringify({
-                    "imageLink": imageLink,
-                    "submitter": submitter,
-                    "submitterLink": submitterLink
-                })
-            });
-            const result = await response.json();
-            if (result.status === "success"){
-                setStatus("Submission successfully sent.");
-            } else {
-                setStatus("Submission has failed; please try again later.")
-            }
-        } catch (error) {
-            setStatus("Failed to send to server.");
-        }
-    };
+    const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <div className="flex flex-col text-center items-center h-full">
+        <div className="flex flex-col text-center items-center flex-grow h-[calc(100vh-12rem)]"> {/* Parent container */}
             <h1 className="text-4xl pb-5">Your Faunart!</h1>
-            <div className="overflow-y-auto flex flex-wrap flex-grow justify-evenly gap-5 p-4">
+            <div className="flex-1 w-full overflow-y-auto flex flex-wrap p-4 rounded"> {/* Modified this div */}
                 {/* Container holding fanart */}
-                { acceptedImages.map((image) => (
-                    <UserSubmissionModule creator={image.creator} submitter={image.submitter} creatorLink={image.creatorLink} submitterLink={image.submitterLink} image={testImage}/>
+                {acceptedImages.map((image) => (
+                    <UserSubmissionImage creator={image.creator} submitter={image.submitter} creatorLink={image.creatorLink} submitterLink={image.submitterLink} image={image.image_path}/>
                 ))}
             </div>
-            <div className='bg-white w-3/4 rounded'>
-                <div className='flex flex-row justify-between'>
-                    <div className='flex flex-grow justify-center items-center'>
-                        <small>Your Username:</small>
-                        <input
-                            type="text"
-                            placeholder="Username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            className="border border-gray-400 p-2 rounded m-2 w-1/8"
-                        />
-                    </div>
-                    <div className='flex flex-grow justify-center items-center'>
-                        <small>Link to your account:</small>
-                        <input
-                            type="text"
-                            placeholder="Link to your account"
-                            value={submitterLink}
-                            onChange={(e) => setSubmitterLink(e.target.value)}
-                            className="border border-gray-400 p-2 rounded m-2 w-1/8"
-                        />
-                    </div>
-                    <div className='flex flex-grow justify-center items-center'>
-                        <small>Image Link:</small>
-                        <input
-                            type="text"
-                            placeholder="Image Link"
-                            value={imageLink}
-                            onChange={(e) => setImageLink(e.target.value)}
-                            className="border border-gray-400 p-2 rounded m-2 w-1/8"
-                        />
-                    </div>
-                    <a className='flex items-center hover:cursor-pointer' onClick={handleSend}>
-                        <img className='w-[32px] h-[32px]' src={send}/>
-                    </a>
-                </div>
-                <p>{status}</p>
-            </div>
+            <button className='bg-white rounded py-2 my-2 px-3 flex' onClick={() => { setIsOpen(!isOpen) }}>
+                Submit Faunart
+            </button>
+            {/* Open modal */}
+            { isOpen && <UserSubmissionModal 
+                isOpen={isOpen}
+                onClose={() => setIsOpen(false)}
+                username={username}
+                setUsername={setUsername}
+                submitterLink={submitterLink}
+                setSubmitterLink={setSubmitterLink}
+                imageLink={imageLink}
+                setImageLink={setImageLink}
+            />}
         </div>
     );
 };
