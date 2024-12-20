@@ -3,7 +3,7 @@ from fauna.client import Client
 from fauna.encoding import QuerySuccess
 from fauna.errors import FaunaException
 from dotenv import load_dotenv
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 import os, sys
@@ -19,7 +19,8 @@ socketio = SocketIO(app, path='/api/ws', cors_allowed_origins="https://fauna-fun
 
 client = Client(secret=secret)
 
-# Get the current counter value from FaunaDB
+#* FAUNA DB
+
 def get_counter_value():
     try:
         query = fql(f"counter.byId({counter_id})")
@@ -28,7 +29,6 @@ def get_counter_value():
     except FaunaException as e:
         print("Exception occurred: " + e, file=sys.stderr)
 
-# Update current counter value from FaunaDB
 def update_counter_value():
     try:
         current_counter = get_counter_value()
@@ -38,7 +38,7 @@ def update_counter_value():
     except FaunaException as e:
         print("Exception occurred: " + e, file=sys.stderr)
 
-#* ROUTES
+#* WEBSOCKETS
 
 @socketio.on('connect')
 def socket_connect():
@@ -60,6 +60,19 @@ def socket_disconnect():
 def error_handler(e):
     print(f"SocketIO Error: {e}")
     emit('error', {'message': str(e)})
+
+#* OTHERS
+
+@app.route("/api/user_submission", methods=["POST"])
+def receive_user_submission():
+    # TODO: gmail API integration
+    # TODO: send data in email
+    # TODO: gmail in requirements.txt
+    # TODO: confirmation response to frontend; json with "status" field
+    try:
+        return jsonify({"status": "success"})
+    except:
+        return jsonify({"status": "failed"})
 
 if __name__ == "__main__":
     # app.run(debug=True)

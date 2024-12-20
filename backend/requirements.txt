@@ -3,5 +3,3 @@ python-dotenv==0.21.0
 fauna==2.4.0
 flask-cors==5.0.0
 flask-socketio==5.4.1
-# flask-sse==1.0.0
-# redis==5.2.1

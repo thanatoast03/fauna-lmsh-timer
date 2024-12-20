@@ -29,24 +29,33 @@ const UserSubmissionModal = ({isOpen, onClose, username, setUsername, submitterL
 
     const handleSend = async () => {
         try {
-            const response = fetch(`${process.env.REACT_APP_PROD}/user_submission`, {
-                method: "POST",
-                headers: {
-                    'Content-Type':'application/json'
-                },
-                body: JSON.stringify({
-                    "imageLink": imageLink,
-                    "submitter": submitter,
-                    "submitterLink": submitterLink
-                })
-            });
-            const result = await response.json();
-            if (result.status === "success"){
-                setStatus("Submission successfully sent.");
-            } else {
-                setStatus("Submission has failed; please try again later.")
+            if (!username) {
+                setStatus("Please enter your username.");
+            } else if (!submitterLink) {
+                setStatus("Please link your account.");
+            } else if(!imageLink) {
+                setStatus("Please send an image link.");
+            } else { // send request only if fields are filled out
+                const response = await fetch(`${process.env.REACT_APP_BACKEND}/user_submission`, {
+                    method: "POST",
+                    headers: {
+                        'Content-Type':'application/json'
+                    },
+                    body: JSON.stringify({
+                        "imageLink": imageLink,
+                        "submitter": username,
+                        "submitterLink": submitterLink
+                    })
+                });
+                const result = await response.json();
+                if (result.status === "success"){
+                    setStatus("Submission successfully sent!");
+                } else {
+                    setStatus("Submission has failed; please try again later.")
+                }
             }
         } catch (error) {
+            console.log(error);
             setStatus("Failed to send to server.");
         }
     };
