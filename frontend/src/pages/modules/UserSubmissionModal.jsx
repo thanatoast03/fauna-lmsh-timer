@@ -40,6 +40,7 @@ const UserSubmissionModal = ({isOpen, onClose, username, setUsername, submitterL
                 setError(true);
                 setStatus("Please send an image link.");
             } else { // send request only if fields are filled out
+                setStatus("Loading...");
                 const response = await fetch(`${process.env.REACT_APP_BACKEND}/user_submission`, {
                     method: "POST",
                     headers: {
@@ -84,7 +85,7 @@ const UserSubmissionModal = ({isOpen, onClose, username, setUsername, submitterL
                 </div>
                 
                 <div className='rounded'>
-                    <div className='flex flex-col text-left'>
+                    <div className='flex flex-col text-left' onKeyDown={handleKeyPress}>
                         <div className='flex flex-col'>
                             <h2>Your Username:</h2>
                             <input
@@ -118,7 +119,7 @@ const UserSubmissionModal = ({isOpen, onClose, username, setUsername, submitterL
                                 className="border border-gray-400 p-2 rounded"
                             />
                         </div>
-                        <p className={`${error ? "text-red-600" : "text-green-300"}`}>{status}</p>
+                        <p className={`${error ? "text-red-600" : "text-green-500"}`}>{status}</p>
                         <button className='px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 mt-2 self-end' onClick={handleSend}>Submit</button>
                     </div>
                 </div>

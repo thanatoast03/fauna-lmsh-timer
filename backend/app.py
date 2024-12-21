@@ -7,9 +7,10 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from googleapiclient.discovery import build
-from email.message import EmailMessage
-from google.oauth2 import service_account
-import os, sys, base64, html
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from email.mime.text import MIMEText
+import os, sys, base64, html, json
 
 # Load environment variables
 load_dotenv()
@@ -69,47 +70,42 @@ def error_handler(e):
 #* GMAIL API
 
 def get_credentials():
-    """Get credentials from Google Cloud default credentials"""
+    """Get credentials from environment variables"""
     try:
-        
-        credentials = service_account.Credentials.from_service_account_file(
-            'credentials.json',
+        creds = Credentials(
+            None,  # Token is not needed here since we'll use refresh token
+            refresh_token=os.getenv('GOOGLE_REFRESH_TOKEN'),
+            token_uri=os.getenv('GOOGLE_TOKEN_URI'),
+            client_id=os.getenv('GOOGLE_CLIENT_ID'),
+            client_secret=os.getenv('GOOGLE_CLIENT_SECRET'),
             scopes=['https://www.googleapis.com/auth/gmail.send']
         )
-
-        return credentials
+        
+        # Refresh the token
+        creds.refresh(Request())
+        return creds
+        
     except Exception as e:
         print(f"Error getting credentials: {e}", file=sys.stderr)
         return None
 
-def send_email(to, subject, body, is_html=False):
+def send_email(to, subject, body):
     """Send an email using Gmail API with OAuth2"""
     try:
-        # Get credentials
         creds = get_credentials()
         if not creds:
             raise Exception("Could not get credentials")
 
-        # Create Gmail API service
         service = build('gmail', 'v1', credentials=creds)
         
-        # Create message container
-        message = EmailMessage()
-        message['To'] = to
-        message['From'] = os.getenv('GOOGLE_EMAIL')  # Your Gmail address
-        message['Subject'] = subject
+        message = MIMEText(body)
+        message['to'] = to
+        message['from'] = os.getenv('GOOGLE_EMAIL')
+        message['subject'] = subject
         
-        # Set content type and body
-        if is_html:
-            message.add_alternative(body, subtype='html')
-        else:
-            message.set_content(body)
-        
-        # Encoded message
-        encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
-        create_message = {"raw": encoded_message}
+        raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
+        create_message = {'raw': raw_message}
 
-        # Send email
         send_message = (
             service.users()
             .messages()
@@ -124,30 +120,56 @@ def send_email(to, subject, body, is_html=False):
         print(f'An error occurred: {error}', file=sys.stderr)
         return None
 
-#* OTHERS
-
 @app.route("/api/user_submission", methods=["POST"])
 def receive_user_submission():
     try:
-        # Get and escape form data
-        imageLink = html.escape(request.json.get('imageLink'))
-        submitter = html.escape(request.json.get('submitter'))
-        submitterLink = html.escape(request.json.get('submitterLink'))
+        data = request.get_json()
+        if not data:
+            raise ValueError("No JSON data received")
+            
+        required_fields = ['imageLink', 'submitter', 'submitterLink']
+        if not all(field in data for field in required_fields):
+            raise ValueError("Missing required fields")
+            
+        imageLink = html.escape(data['imageLink'])
+        submitter = html.escape(data['submitter'])
+        submitterLink = html.escape(data['submitterLink'])
 
-        body_content = f"New art submission from: {submitter}\nLink to their account: {submitterLink}\n\nLink to the image: {imageLink}"
+        body_content = f"""
+            New art submission received!
 
-        #TODO: submission error
-        if send_email(os.getenv('DEV_EMAIL'), 
-                     f"new art submission from: {submitter}", 
-                     body_content):
-            return jsonify({"status": "success"})
-        else:
+            Submitter: {submitter}
+            Submitter's Account: {submitterLink}
+            Image Link: {imageLink}
+        """
+
+        result = send_email(
+            to=os.getenv('DEV_EMAIL'),
+            subject=f"Fauna Website: New Art Submission from {submitter}",
+            body=body_content
+        )
+        
+        if not result:
             raise Exception("Failed to send email")
             
+        return jsonify({
+            "status": "success",
+            "message": "Email sent successfully"
+        })
+            
+    except ValueError as e:
+        print(f"Validation error: {str(e)}", file=sys.stderr)
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 400
     except Exception as e:
-        print(str(e), file=sys.stderr)
-        return jsonify({"status": "failed"})
-
+        print(f"Server error: {str(e)}", file=sys.stderr)
+        return jsonify({
+            "status": "error",
+            "message": "An internal server error occurred"
+        }), 500
+    
 if __name__ == "__main__":
     # app.run(debug=True)
     socketio.run(app, host="0.0.0.0", port=8080)
