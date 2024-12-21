@@ -10,7 +10,9 @@ from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from email.mime.text import MIMEText
-import os, sys, base64, html, json
+import os, sys, base64, html
+
+MAX_IMGLINK_LENGTH, MAX_USERNAME_LENGTH, MAX_USER_LINK_LENGTH = 100, 15, 30
 
 # Load environment variables
 load_dotenv()
@@ -134,6 +136,9 @@ def receive_user_submission():
         imageLink = html.escape(data['imageLink'])
         submitter = html.escape(data['submitter'])
         submitterLink = html.escape(data['submitterLink'])
+
+        if len(imageLink) > MAX_IMGLINK_LENGTH or len(submitter) > MAX_USERNAME_LENGTH or len(submitterLink) > MAX_USER_LINK_LENGTH:
+            raise ValueError("Length of field is too long")
 
         body_content = f"""
 New art submission received!
