@@ -1,7 +1,7 @@
 # Updated fly.toml for WebSocket support
 
 app = "fauna-lmsh-timer"
-primary_region = "yyz"
+primary_region = "ord"
 
 [build]
 
@@ -48,6 +48,6 @@ primary_region = "yyz"
   #   timeout = "10s"
 
 [[vm]]
-  memory = "512mb"  # Increased for WebSocket support
+  memory = "256mb"
   cpu_kind = "shared"
   cpus = 1

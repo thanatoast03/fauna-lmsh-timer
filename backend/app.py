@@ -136,11 +136,11 @@ def receive_user_submission():
         submitterLink = html.escape(data['submitterLink'])
 
         body_content = f"""
-            New art submission received!
+New art submission received!
 
-            Submitter: {submitter}
-            Submitter's Account: {submitterLink}
-            Image Link: {imageLink}
+Submitter: {submitter}
+Submitter's Account: {submitterLink}
+Image Link: {imageLink}
         """
 
         result = send_email(
