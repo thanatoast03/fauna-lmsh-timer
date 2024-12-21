@@ -3,6 +3,7 @@ import { React, useState, useRef, useEffect } from 'react';
 const UserSubmissionModal = ({isOpen, onClose, username, setUsername, submitterLink, setSubmitterLink, imageLink, setImageLink}) => {
     const modalRef = useRef();
     const [status, setStatus] = useState('');
+    const [error, setError] = useState(false);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -30,10 +31,13 @@ const UserSubmissionModal = ({isOpen, onClose, username, setUsername, submitterL
     const handleSend = async () => {
         try {
             if (!username) {
+                setError(true);
                 setStatus("Please enter your username.");
             } else if (!submitterLink) {
+                setError(true);
                 setStatus("Please link your account.");
             } else if(!imageLink) {
+                setError(true);
                 setStatus("Please send an image link.");
             } else { // send request only if fields are filled out
                 const response = await fetch(`${process.env.REACT_APP_BACKEND}/user_submission`, {
@@ -49,13 +53,16 @@ const UserSubmissionModal = ({isOpen, onClose, username, setUsername, submitterL
                 });
                 const result = await response.json();
                 if (result.status === "success"){
+                    setError(false);
                     setStatus("Submission successfully sent!");
                 } else {
+                    setError(true);
                     setStatus("Submission has failed; please try again later.")
                 }
             }
         } catch (error) {
-            console.log(error);
+            console.log(error); 
+            setError(true);
             setStatus("Failed to send to server.");
         }
     };
@@ -111,7 +118,7 @@ const UserSubmissionModal = ({isOpen, onClose, username, setUsername, submitterL
                                 className="border border-gray-400 p-2 rounded"
                             />
                         </div>
-                        <p>{status}</p>
+                        <p className={`${error ? "text-red-600" : "text-green-300"}`}>{status}</p>
                         <button className='px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 mt-2 self-end' onClick={handleSend}>Submit</button>
                     </div>
                 </div>

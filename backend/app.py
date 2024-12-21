@@ -3,21 +3,26 @@ from fauna.client import Client
 from fauna.encoding import QuerySuccess
 from fauna.errors import FaunaException
 from dotenv import load_dotenv
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
-import os, sys
+from googleapiclient.discovery import build
+from email.message import EmailMessage
+from google.oauth2 import service_account
+import os, sys, base64, html
 
+# Load environment variables
 load_dotenv()
 
+# FaunaDB
 secret = os.getenv('FAUNADB_SECRET_KEY')
 counter_id = os.getenv("COUNTER_ID")
+client = Client(secret=secret)
 
+# App Server
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": ["https://fauna-fun-sites.vercel.app"]}})
 socketio = SocketIO(app, path='/api/ws', cors_allowed_origins="https://fauna-fun-sites.vercel.app")
-
-client = Client(secret=secret)
 
 #* FAUNA DB
 
@@ -61,17 +66,86 @@ def error_handler(e):
     print(f"SocketIO Error: {e}")
     emit('error', {'message': str(e)})
 
+#* GMAIL API
+
+def get_credentials():
+    """Get credentials from Google Cloud default credentials"""
+    try:
+        
+        credentials = service_account.Credentials.from_service_account_file(
+            'credentials.json',
+            scopes=['https://www.googleapis.com/auth/gmail.send']
+        )
+
+        return credentials
+    except Exception as e:
+        print(f"Error getting credentials: {e}", file=sys.stderr)
+        return None
+
+def send_email(to, subject, body, is_html=False):
+    """Send an email using Gmail API with OAuth2"""
+    try:
+        # Get credentials
+        creds = get_credentials()
+        if not creds:
+            raise Exception("Could not get credentials")
+
+        # Create Gmail API service
+        service = build('gmail', 'v1', credentials=creds)
+        
+        # Create message container
+        message = EmailMessage()
+        message['To'] = to
+        message['From'] = os.getenv('GOOGLE_EMAIL')  # Your Gmail address
+        message['Subject'] = subject
+        
+        # Set content type and body
+        if is_html:
+            message.add_alternative(body, subtype='html')
+        else:
+            message.set_content(body)
+        
+        # Encoded message
+        encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
+        create_message = {"raw": encoded_message}
+
+        # Send email
+        send_message = (
+            service.users()
+            .messages()
+            .send(userId="me", body=create_message)
+            .execute()
+        )
+        
+        print(f'Message Id: {send_message["id"]}', file=sys.stderr)
+        return send_message
+        
+    except Exception as error:
+        print(f'An error occurred: {error}', file=sys.stderr)
+        return None
+
 #* OTHERS
 
 @app.route("/api/user_submission", methods=["POST"])
 def receive_user_submission():
-    # TODO: gmail API integration
-    # TODO: send data in email
-    # TODO: gmail in requirements.txt
-    # TODO: confirmation response to frontend; json with "status" field
     try:
-        return jsonify({"status": "success"})
-    except:
+        # Get and escape form data
+        imageLink = html.escape(request.json.get('imageLink'))
+        submitter = html.escape(request.json.get('submitter'))
+        submitterLink = html.escape(request.json.get('submitterLink'))
+
+        body_content = f"New art submission from: {submitter}\nLink to their account: {submitterLink}\n\nLink to the image: {imageLink}"
+
+        #TODO: submission error
+        if send_email(os.getenv('DEV_EMAIL'), 
+                     f"new art submission from: {submitter}", 
+                     body_content):
+            return jsonify({"status": "success"})
+        else:
+            raise Exception("Failed to send email")
+            
+    except Exception as e:
+        print(str(e), file=sys.stderr)
         return jsonify({"status": "failed"})
 
 if __name__ == "__main__":

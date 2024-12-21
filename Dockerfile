@@ -14,6 +14,7 @@ COPY backend/ /app/backend
 
 # Copy .env file
 COPY .env .
+COPY credentials.json /app/backend/credentials.json
 
 WORKDIR /app/backend
 EXPOSE 8080
