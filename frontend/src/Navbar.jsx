@@ -49,25 +49,13 @@ const Navbar = () => {
                     </Link>
                     <Link
                         to="/LMSH"
-                        className="bg-[#414857] text-[#fdfbc0] px-4 py-2 rounded hover:bg-gray-800 block md:hidden transform hover:scale-105 hover:shadow-lg"
-                    >
-                        LMSH Timer
-                    </Link>
-                    <Link
-                        to="/LMSH"
-                        className="bg-[#414857] text-[#fdfbc0] px-4 py-2 rounded hover:bg-gray-800 hidden md:block transform hover:scale-105 hover:shadow-lg"
+                        className="bg-[#414857] text-[#fdfbc0] px-4 py-2 rounded hover:bg-gray-800 transform hover:scale-105 hover:shadow-lg"
                     >
                         LMSH Epoch Timer
                     </Link>
                     <Link
                         to="/MILF"
-                        className="bg-[#414857] text-[#fdfbc0] px-4 py-2 rounded hover:bg-gray-800 block md:hidden transform hover:scale-105 hover:shadow-lg"
-                    >
-                        MILF Count
-                    </Link>
-                    <Link
-                        to="/MILF"
-                        className="bg-[#414857] text-[#fdfbc0] px-4 py-2 rounded hover:bg-gray-800 hidden md:block transform hover:scale-105 hover:shadow-lg"
+                        className="bg-[#414857] text-[#fdfbc0] px-4 py-2 rounded hover:bg-gray-800 transform hover:scale-105 hover:shadow-lg"
                     >
                         Man I Love Fauna Counter
                     </Link>
