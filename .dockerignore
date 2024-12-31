@@ -5,3 +5,5 @@ __pycache__/
 Dockerfile
 /frontend
 .vercelignore
+generate_token.py
+state.json

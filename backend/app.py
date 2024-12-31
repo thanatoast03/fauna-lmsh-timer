@@ -12,7 +12,7 @@ from google.oauth2.credentials import Credentials
 from email.mime.text import MIMEText
 import os, sys, base64, html
 
-MAX_IMGLINK_LENGTH, MAX_USERNAME_LENGTH, MAX_USER_LINK_LENGTH = 100, 15, 30
+MAX_SUGGESTION_LENGTH, MAX_IMGLINK_LENGTH, MAX_USERNAME_LENGTH, MAX_USER_LINK_LENGTH = 4000, 100, 15, 30
 
 # Load environment variables
 load_dotenv()
@@ -128,17 +128,20 @@ def receive_user_submission():
         data = request.get_json()
         if not data:
             raise ValueError("No JSON data received")
-            
-        required_fields = ['imageLink', 'submitter', 'submitterLink']
-        if not all(field in data for field in required_fields):
-            raise ValueError("Missing required fields")
-            
-        imageLink = html.escape(data['imageLink'])
-        submitter = html.escape(data['submitter'])
-        submitterLink = html.escape(data['submitterLink'])
+        
+        unsafe_imageLink = data['imageLink']
+        unsafe_submitter = data['submitter'] if data['submitter'] else "Anonymous Sap"
+        unsafe_submitterLink = data['submitterLink'] if data['submitterLink'] else "No link provided by user"
 
-        if len(imageLink) > MAX_IMGLINK_LENGTH or len(submitter) > MAX_USERNAME_LENGTH or len(submitterLink) > MAX_USER_LINK_LENGTH:
+        #* Error checking
+        if not unsafe_imageLink:
+            raise ValueError("No link provided")
+        if len(unsafe_imageLink) > MAX_IMGLINK_LENGTH or len(unsafe_submitter) > MAX_USERNAME_LENGTH or len(unsafe_submitterLink) > MAX_USER_LINK_LENGTH:
             raise ValueError("Length of field is too long")
+        
+        imageLink = html.escape(unsafe_imageLink) 
+        submitter = html.escape(unsafe_submitter)
+        submitterLink = html.escape(unsafe_submitterLink)
 
         body_content = f"""
 New art submission received!
@@ -151,6 +154,64 @@ Image Link: {imageLink}
         result = send_email(
             to=os.getenv('DEV_EMAIL'),
             subject=f"Fauna Website: New Art Submission from {submitter}",
+            body=body_content
+        )
+        
+        if not result:
+            raise Exception("Failed to send email")
+            
+        return jsonify({
+            "status": "success",
+            "message": "Email sent successfully"
+        })
+            
+    except ValueError as e:
+        print(f"Validation error: {str(e)}", file=sys.stderr)
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 400
+    except Exception as e:
+        print(f"Server error: {str(e)}", file=sys.stderr)
+        return jsonify({
+            "status": "error",
+            "message": "An internal server error occurred"
+        }), 500
+    
+@app.route("/api/user_suggestions", methods=["POST"])
+def receive_user_suggestion():
+    try:
+        data = request.get_json()
+        if not data:
+            raise ValueError("No JSON data received")
+        
+        unsafe_suggestion = data['suggestion']
+        unsafe_submitter = data['submitter'] if data['submitter'] else "Anonymous Sap"
+        unsafe_submitterLink = data['submitterLink'] if data['submitterLink'] else "No link provided by user"
+
+        #* Error checking
+        if not unsafe_suggestion:
+            raise ValueError("No suggestion provided")
+        if len(unsafe_suggestion) > MAX_SUGGESTION_LENGTH or len(unsafe_submitter) > MAX_USERNAME_LENGTH or len(unsafe_submitterLink) > MAX_USER_LINK_LENGTH:
+            raise ValueError("Length of field is too long")
+        
+        suggestion = html.escape(unsafe_suggestion) 
+        submitter = html.escape(unsafe_submitter)
+        submitterLink = html.escape(unsafe_submitterLink)
+
+        body_content = f"""
+New art submission received!
+
+Submitter: {submitter}
+Submitter's Account: {submitterLink}
+
+Suggestion: 
+{suggestion}
+        """
+
+        result = send_email(
+            to=os.getenv('DEV_EMAIL'),
+            subject=f"Fauna Website: New Suggestion from {submitter}",
             body=body_content
         )
         

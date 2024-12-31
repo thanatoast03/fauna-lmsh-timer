@@ -1,6 +1,6 @@
 import { React, useState, useRef, useEffect } from 'react';
 
-const UserSubmissionModal = ({isOpen, onClose, username, setUsername, submitterLink, setSubmitterLink, imageLink, setImageLink}) => {
+const SuggestionModal = ({isOpen, onClose, username, setUsername, submitterLink, setSubmitterLink, suggestion, setSuggestion}) => {
     const modalRef = useRef();
     const [status, setStatus] = useState('');
     const [error, setError] = useState(false);
@@ -35,13 +35,13 @@ const UserSubmissionModal = ({isOpen, onClose, username, setUsername, submitterL
                 setStatus("Please send an image link.");
             } else { // send request only if required fields are filled out
                 setStatus("Loading...");
-                const response = await fetch(`${process.env.REACT_APP_BACKEND}/user_submission`, {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND}/user_suggestions`, {
                     method: "POST",
                     headers: {
                         'Content-Type':'application/json'
                     },
                     body: JSON.stringify({
-                        "imageLink": imageLink,
+                        "suggestion": suggestion,
                         "submitter": username,
                         "submitterLink": submitterLink
                     })
@@ -68,11 +68,11 @@ const UserSubmissionModal = ({isOpen, onClose, username, setUsername, submitterL
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div 
                 ref={modalRef}
-                className="bg-white rounded-lg p-6 max-w-md w-full mx-4 relative"
+                className="bg-white rounded-lg p-6 max-w-lg w-full mx-4 relative text-black"
             >
                 <div className='flex flex-row justify-center text-center'>
                     
-                    <h2 className="text-xl font-bold mb-4">Submit Faunart</h2>
+                    <h2 className="text-xl font-bold mb-4">Submit Suggestions</h2>
                     <button onClick={onClose} className=" text-gray-500 hover:text-gray-700 ml-auto inline-flex">
                         ×
                     </button>
@@ -81,7 +81,7 @@ const UserSubmissionModal = ({isOpen, onClose, username, setUsername, submitterL
                 <div className='rounded'>
                     <div className='flex flex-col text-left' onKeyDown={handleKeyPress}>
                         <div className='flex flex-col'>
-                            <h2>Your Username:</h2>
+                            <h2>Your Username (optional)</h2>
                             <input
                                 type="text"
                                 placeholder="Username"
@@ -92,7 +92,7 @@ const UserSubmissionModal = ({isOpen, onClose, username, setUsername, submitterL
                             />
                         </div>
                         <div className='flex flex-col my-2'>
-                            <h2>Link to your account:</h2>
+                            <h2>Link to your account (optional)</h2>
                             <input
                                 type="text"
                                 placeholder="Link to your account"
@@ -103,14 +103,13 @@ const UserSubmissionModal = ({isOpen, onClose, username, setUsername, submitterL
                             />
                         </div>
                         <div className='flex flex-col mb-2'>
-                            <h2>Image Link:</h2>
-                            <input
-                                type="text"
-                                placeholder="Image Link"
-                                maxLength="100"
-                                value={imageLink}
-                                onChange={(e) => setImageLink(e.target.value)}
-                                className="border border-gray-400 p-2 rounded"
+                            <h2>Suggestion (required)</h2>
+                            <textarea
+                                placeholder="Suggestion"
+                                maxLength="4000"
+                                value={suggestion}
+                                onChange={(e) => setSuggestion(e.target.value)}
+                                className="border border-gray-400 p-2 rounded min-h-[200px] overflow-y-auto resize-none w-full"
                             />
                         </div>
                         <p className={`${error ? "text-red-600" : "text-green-500"}`}>{status}</p>
@@ -123,4 +122,4 @@ const UserSubmissionModal = ({isOpen, onClose, username, setUsername, submitterL
     );
 };
 
-export default UserSubmissionModal;
+export default SuggestionModal;

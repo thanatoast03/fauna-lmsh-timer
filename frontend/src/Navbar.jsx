@@ -1,11 +1,18 @@
 import { Link } from 'react-router-dom';
 import { React, useState, useRef, useEffect } from 'react';
 import './index.css';
+import SuggestionModal from './pages/modules/SuggestionModal';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [isSuggestionOpen, setIsSuggestionOpen] = useState(false);
     const dropdownRef = useRef(null);
     const buttonRef = useRef(null);
+
+    // hold modal information so it isn't deleted unless on reload
+    const [username, setUsername] = useState('');
+    const [submitterLink, setSubmitterLink] = useState('');
+    const [suggestion, setSuggestion] = useState('');
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -27,6 +34,10 @@ const Navbar = () => {
         setIsOpen(!isOpen);
     };
 
+    const handleSuggestionClick = () => {
+        setIsSuggestionOpen(!isSuggestionOpen);
+    }
+
     return (
         <div className="bg-[#5f7b8d] text-white flex flex-col relative mb-4">
             {/* Navbar */}
@@ -39,8 +50,8 @@ const Navbar = () => {
                     Home
                 </Link>
 
-                {/* Right Section - Buttons; ONLY SHOWS UNTIL MOBILE VIEW */}
-                <div className="sm:flex space-x-4 hidden">
+                {/* ONLY SHOW WHEN LG+ */}
+                <div className="lg:flex space-x-4 hidden">
                     <Link
                         to="/submissions"
                         className="bg-[#414857] text-[#fdfbc0] px-4 py-2 rounded hover:bg-gray-800 block transform hover:scale-105 hover:shadow-lg"
@@ -59,12 +70,18 @@ const Navbar = () => {
                     >
                         Man I Love Fauna Counter
                     </Link>
+                    <button
+                        className="bg-[#414857] text-[#fdfbc0] px-4 py-2 rounded hover:bg-gray-800 transform hover:scale-105 hover:shadow-lg"
+                        onClick={() => { setIsSuggestionOpen(true) }}
+                    >
+                        Suggestions?
+                    </button>
                 </div>
 
                 {/* Hamburger Button */}
                 <button
                     ref={buttonRef}
-                    className="block sm:hidden w-6 h-6 cursor-pointer relative"
+                    className="block lg:hidden w-6 h-6 cursor-pointer relative"
                     onClick={handleClick}
                     aria-label="Toggle menu"
                 >
@@ -90,7 +107,7 @@ const Navbar = () => {
             {isOpen && (
                 <div 
                     ref={dropdownRef}
-                    className="absolute right-0 top-full bg-white text-black w-[200px] shadow-lg rounded-lg sm:hidden"
+                    className="absolute right-0 top-full bg-white text-black w-[200px] shadow-lg rounded-lg "
                 >
                     <Link
                         to="/submissions"
@@ -108,13 +125,30 @@ const Navbar = () => {
                     </Link>
                     <Link
                         to="/MILF"
-                        className="block px-4 py-2 hover:bg-gray-200 rounded-b-lg"
+                        className="block px-4 py-2 hover:bg-gray-200"
                         onClick={() => {setIsOpen(false)}}
                     >
                         Man I Love Fauna Counter
                     </Link>
+                    <button
+                        className="block px-4 py-2 hover:bg-gray-200 rounded-b-lg w-full text-left"
+                        onClick={() => {setIsOpen(false); setIsSuggestionOpen(true); }}
+                    >
+                        Suggestions?
+                    </button>
                 </div>
             )}
+
+            { isSuggestionOpen && <SuggestionModal
+                isOpen={isSuggestionOpen}
+                onClose={() => setIsSuggestionOpen(false)}
+                username={username}
+                setUsername={setUsername}
+                submitterLink={submitterLink}
+                setSubmitterLink={setSubmitterLink}
+                suggestion={suggestion}
+                setSuggestion={setSuggestion}
+            /> }
         </div>
     );
 };
