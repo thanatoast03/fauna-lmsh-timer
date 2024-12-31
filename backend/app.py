@@ -200,7 +200,7 @@ def receive_user_suggestion():
         submitterLink = html.escape(unsafe_submitterLink)
 
         body_content = f"""
-New art submission received!
+New suggestion received!
 
 Submitter: {submitter}
 Submitter's Account: {submitterLink}

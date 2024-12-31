@@ -30,9 +30,9 @@ const SuggestionModal = ({isOpen, onClose, username, setUsername, submitterLink,
 
     const handleSend = async () => {
         try {
-            if(!imageLink) {
+            if(!suggestion) {
                 setError(true);
-                setStatus("Please send an image link.");
+                setStatus("Please send a suggestion.");
             } else { // send request only if required fields are filled out
                 setStatus("Loading...");
                 const response = await fetch(`${process.env.REACT_APP_BACKEND}/user_suggestions`, {
