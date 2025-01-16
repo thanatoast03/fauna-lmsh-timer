@@ -4,8 +4,9 @@ import { useMouse } from "react-use";
 import MissingFaunaModal from './modules/MissingFaunaModal';
 import slowestFaunaSound from 'url:../sounds/slowest_fauna_beep.mp3';
 import slowFaunaSound from 'url:../sounds/slow_fauna_beep.mp3';
-import fastFaunaSound from 'url:../sounds/closer_fauna_beep.mp3';
+import fastFaunaSound from 'url:../sounds/fast_fauna_beep.mp3';
 import fastestFaunaSound from 'url:../sounds/fastest_fauna_beep.mp3';
+import won from 'url:../sounds/I_WONNN.mp3';
 import { useWindowSize, useInterval } from './modules/MissingFaunaHooks';
 import uuu from '../../public/images/uuu.webp';
 
@@ -21,6 +22,7 @@ const MissingFauna = () => {
     const [playSlow] = useSound(slowFaunaSound);
     const [playFast] = useSound(fastFaunaSound);
     const [playFastest] = useSound(fastestFaunaSound);
+    const [playWon] = useSound(won);
 
     const containerRef = useRef(null);
     const { docX, docY } = useMouse(containerRef);
@@ -46,10 +48,10 @@ const MissingFauna = () => {
 
     useInterval(() => {
         if (!found && gameStart) {
-            console.log("Distance Level:", distanceLevel, "Distance:", distance);
+            //console.log("Distance Level:", distanceLevel, "Distance:", distance);
             playSound();
         }
-    }, 630);
+    }, 850);
 
     // Calculate distance between cursor and Fauna
     const distance = useMemo(() => {
@@ -64,7 +66,7 @@ const MissingFauna = () => {
     useEffect(() => {
         if (!gameStart || found) return;
 
-        if (distance < 90) {
+        if (distance < 100) {
             setDistanceLevel(3);
         } else if (distance < 200) {
             setDistanceLevel(2);
@@ -80,6 +82,9 @@ const MissingFauna = () => {
             setGameStart(false);
             setFound(true);
             setFoundCount(prev => prev + 1);
+            setTimeout(() => {
+                playWon(); // VICTORY FANFARE!! LMAO
+            }, 1000);
         }
     };
 
@@ -89,7 +94,7 @@ const MissingFauna = () => {
             className='flex flex-grow items-center justify-center h-[calc(100vh-12rem)] relative'
         >
             {!gameStart && 
-                <div className='z-10'>
+                <div className='mx-5 z-10'>
                     <MissingFaunaModal 
                         setGameStart={setGameStart}
                         found={found}
@@ -103,10 +108,9 @@ const MissingFauna = () => {
                 onClick={handleFaunaFound}
                 className='hover:cursor-pointer absolute'
                 style={{
-                    top: found ? "calc(50% - 16px)" : `${faunaY}px`,
-                    left: found ? "calc(50% - 16px)" : `${faunaX}px`,
-                    opacity: found ? 1 : 0,
-                    zIndex: 0,
+                    top: found ? `calc(50% - ${emoteSize}px)` : `${faunaY}px`,
+                    left: found ? `calc(50% - ${emoteSize}px)` : `${faunaX}px`,
+                    opacity: 0,
                     width: emoteSize,
                     height: emoteSize
                 }}

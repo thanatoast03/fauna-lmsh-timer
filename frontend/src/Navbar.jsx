@@ -34,10 +34,6 @@ const Navbar = () => {
         setIsOpen(!isOpen);
     };
 
-    const handleSuggestionClick = () => {
-        setIsSuggestionOpen(!isSuggestionOpen);
-    }
-
     return (
         <div className="bg-[#5f7b8d] text-white flex flex-col relative mb-4">
             {/* Navbar */}
@@ -78,7 +74,7 @@ const Navbar = () => {
                     </Link>
                     <button
                         className="bg-[#414857] text-[#fdfbc0] px-4 py-2 rounded hover:bg-gray-800 transform hover:scale-105 hover:shadow-lg"
-                        onClick={() => { setIsSuggestionOpen(true) }}
+                        onClick={() => { setIsSuggestionOpen(true); }}
                     >
                         Suggestions?
                     </button>
@@ -113,7 +109,7 @@ const Navbar = () => {
             {isOpen && (
                 <div 
                     ref={dropdownRef}
-                    className="absolute right-0 top-full bg-white text-black w-[200px] shadow-lg rounded-lg "
+                    className="absolute right-0 top-full bg-white text-black w-[200px] shadow-lg rounded-lg z-20"
                 >
                     <Link 
                         to="/findfauna"
