@@ -22,7 +22,7 @@ const UserSubmissions = () => {
 
     return (
         <div className="flex flex-col text-center items-center flex-grow h-[calc(100vh-12rem)]"> {/* Parent container */}
-            <h1 className="text-4xl pb-5">Your Faunart!</h1>
+            <h1 className="text-4xl pb-5 font-bold">Your Faunart!</h1>
             <div className="flex-1 w-full overflow-y-auto flex flex-wrap p-4 rounded"> {/* Modified this div */}
                 {/* Container holding fanart */}
                 {acceptedImages.map((image) => (

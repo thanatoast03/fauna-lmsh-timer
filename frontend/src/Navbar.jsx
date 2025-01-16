@@ -53,6 +53,12 @@ const Navbar = () => {
                 {/* ONLY SHOW WHEN LG+ */}
                 <div className="lg:flex space-x-4 hidden">
                     <Link
+                        to="/findfauna"
+                        className="bg-[#414857] text-[#fdfbc0] px-4 py-2 rounded hover:bg-gray-800 block transform hover:scale-105 hover:shadow-lg"
+                    >
+                        Find Fauna
+                    </Link>
+                    <Link
                         to="/submissions"
                         className="bg-[#414857] text-[#fdfbc0] px-4 py-2 rounded hover:bg-gray-800 block transform hover:scale-105 hover:shadow-lg"
                     >
@@ -109,6 +115,13 @@ const Navbar = () => {
                     ref={dropdownRef}
                     className="absolute right-0 top-full bg-white text-black w-[200px] shadow-lg rounded-lg "
                 >
+                    <Link 
+                        to="/findfauna"
+                        className="block px-4 py-2 hover:bg-gray-200"
+                        onClick={() => {setIsOpen(false)}}
+                    >
+                        Find Fauna
+                    </Link>
                     <Link
                         to="/submissions"
                         className="block px-4 py-2 hover:bg-gray-200"

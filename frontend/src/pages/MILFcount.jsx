@@ -53,7 +53,7 @@ const MILFCount = () => {
     }
 
     return (
-        <div className='flex flex-col h-full'>
+        <div className='flex flex-col h-[calc(100vh-12rem)]'>
             <div className='flex flex-col justify-center items-center flex-grow'>
                 <h1 className='text-4xl sm:text-6xl font-bold'>{counter}</h1>
                 <h1 className='text-2xl sm:text-4xl pb-10'>Man I Love Fauna Counter</h1>

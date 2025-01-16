@@ -6,6 +6,7 @@ import Navbar from './Navbar.jsx';
 import Landing from './pages/landing.jsx';
 import MILFCount from './pages/MILFcount.jsx';
 import UserSubmissions from './pages/UserSubmissions.jsx';
+import MissingFauna from './pages/MissingFauna.jsx';
 
 function App() {
     return(
@@ -17,6 +18,7 @@ function App() {
                     <Route path="/LMSH" element={<LMSHTimer />}/>
                     <Route path="/MILF" element={<MILFCount /> }/>
                     <Route path="/submissions" element={<UserSubmissions />}/>
+                    <Route path="/findfauna" element={<MissingFauna />}/>
                 </Routes>
             </HashRouter>
             <footer className="flex flex-col text-center items-center p-4 text-sm">
