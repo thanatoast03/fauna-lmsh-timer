@@ -1,3 +1,3 @@
-# fauna-lmsh-timer
+# fauna-fun-sites
 
-let me stay heres since epoch
+a bunch of fun sites related to Ceres Fauna!
