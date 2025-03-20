@@ -28,7 +28,7 @@ primary_region = "ord"
   # processes = ["app"]
   protocol = "tcp"
   
-  # WebSocket-specific configuration
+  # webSocket-specific configuration
   [services.websockets]
     enabled = true
 
@@ -40,12 +40,6 @@ primary_region = "ord"
   [[services.ports]]
     handlers = ["tls", "http"]
     port = 443
-
-  # [[services.tcp_checks]]
-  #   grace_period = "10s"
-  #   interval = "15s"
-  #   restart_limit = 0
-  #   timeout = "10s"
 
 [[vm]]
   memory = "256mb"

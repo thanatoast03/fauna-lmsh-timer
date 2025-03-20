@@ -13,7 +13,7 @@ const MILFCount = () => {
     useEffect(() => {
         const newSocket = io(`${process.env.REACT_APP_SOCKET}`, {
             path: "/api/ws",
-            transports: ['websocket'],  // Force WebSocket
+            transports: ['websocket'],  // force WebSocket
         });
         process.env.REACT_APP_PROD === "false" ? setLoading(false) : setLoading(loading); 
         setSocket(newSocket);

@@ -5,14 +5,14 @@ FROM python:3.12.8-slim AS final
 # Create virtual environment in the correct location
 RUN python -m venv /opt/venv
 
-# Install Python dependencies
+# install python dependencies
 COPY backend/requirements.txt .
 RUN /opt/venv/bin/pip install -r requirements.txt
 
 # Copy backend application code
-COPY backend/ /app/backend
+COPY ./backend /app/backend
 
-# Copy .env file
+# copy .env file
 COPY .env .
 
 WORKDIR /app/backend

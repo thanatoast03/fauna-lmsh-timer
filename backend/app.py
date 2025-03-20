@@ -1,7 +1,3 @@
-from fauna import fql
-from fauna.client import Client
-from fauna.encoding import QuerySuccess
-from fauna.errors import FaunaException
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -10,41 +6,53 @@ from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from email.mime.text import MIMEText
-import os, sys, base64, html
+import os, sys, base64, html, redis
 
 MAX_SUGGESTION_LENGTH, MAX_IMGLINK_LENGTH, MAX_USERNAME_LENGTH, MAX_USER_LINK_LENGTH = 4000, 100, 15, 30
 
-# Load environment variables
+# load env variables
 load_dotenv()
 
-# FaunaDB
-secret = os.getenv('FAUNADB_SECRET_KEY')
-counter_id = os.getenv("COUNTER_ID")
-client = Client(secret=secret)
+r = redis.Redis(
+    host=os.getenv("REDIS_HOST"),
+    port=os.getenv("REDIS_PORT"),
+    password=os.getenv("REDIS_PASSWORD"),
+    decode_responses=True
+)
+COUNTER_KEY = os.getenv('COUNTER_KEY')
+COUNTER_CHANNEL = os.getenv('COUNTER_CHANNEL')
 
-# App Server
+# server
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": ["https://fauna-fun-sites.vercel.app"]}})
 socketio = SocketIO(app, path='/api/ws', cors_allowed_origins="https://fauna-fun-sites.vercel.app")
 
-#* FAUNA DB
+#* redis :( i miss fauna
 
 def get_counter_value():
     try:
-        query = fql(f"counter.byId({counter_id})")
-        res: QuerySuccess = client.query(query)
-        return res.data["counter"]
-    except FaunaException as e:
-        print("Exception occurred: " + e, file=sys.stderr)
+        value = r.get(COUNTER_KEY)
+        if value is None:
+            # initialize counter if it doesn't exist
+            r.set(COUNTER_KEY, 0)
+            return 0
+        return int(value)
+    except Exception as e:
+        print(f"Error getting counter value: {e}", file=sys.stderr)
+        return 0
 
 def update_counter_value():
     try:
-        current_counter = get_counter_value()
-        query = fql("counter.byId(" + str(counter_id) + ")?.update({counter: " + str(current_counter + 1) + "})")
-        res: QuerySuccess = client.query(query)
-        return res.data['counter']
-    except FaunaException as e:
-        print("Exception occurred: " + e, file=sys.stderr)
+        # increment counter
+        new_value = r.incr(COUNTER_KEY)
+
+        # update counter channel
+        r.publish(COUNTER_CHANNEL, new_value)
+
+        return new_value
+    except Exception as e:
+        print(f"Error updating counter value: {e}", file=sys.stderr)
+        return get_counter_value()
 
 #* WEBSOCKETS
 
@@ -57,12 +65,12 @@ def socket_connect():
 @socketio.on('increment')
 def socket_increment():
     new_counter = update_counter_value() # will broadcast new value to all in websocket
-    emit('counter_update', {'value': new_counter}, broadcast=True)
+    emit('counter_update', {'value': int(new_counter)}, broadcast=True)
     print(new_counter)
 
 @socketio.on('disconnect')
-def socket_disconnect():
-    print("client disconnected")
+def socket_disconnect(reason=None):
+    print(f"client disconnected: {reason}", file=sys.stderr)
 
 @socketio.on_error()
 def error_handler(e):
@@ -72,10 +80,10 @@ def error_handler(e):
 #* GMAIL API
 
 def get_credentials():
-    """Get credentials from environment variables"""
+    """get credentials from environment variables"""
     try:
         creds = Credentials(
-            None,  # Token is not needed here since we'll use refresh token
+            None,  # token is not needed here since we'll use refresh token
             refresh_token=os.getenv('GOOGLE_REFRESH_TOKEN'),
             token_uri=os.getenv('GOOGLE_TOKEN_URI'),
             client_id=os.getenv('GOOGLE_CLIENT_ID'),
@@ -83,7 +91,7 @@ def get_credentials():
             scopes=['https://www.googleapis.com/auth/gmail.send']
         )
         
-        # Refresh the token
+        # refresh token
         creds.refresh(Request())
         return creds
         
